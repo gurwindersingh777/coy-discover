@@ -35,7 +35,7 @@ One app: the UI and the API live in the same Next.js project.
 
 ## Getting started
 
-Requires Node.js 20.9 or newer.
+Requires Node.js 24 (what it was built and tested on). CI installs, tests and builds it on Linux, Windows and macOS.
 
 ```bash
 git clone https://github.com/gurwindersingh777/coy-discover.git
