@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -28,8 +27,29 @@ export function useDiscover() {
   }, []);
 
   useEffect(() => {
-    void loadFeed();
-  }, [loadFeed]);
+    let ignore = false;
+
+    async function fetchInitialFeed() {
+      try {
+        const data = await getDiscoverFeed();
+        if (!ignore) {
+          setProfiles(data.profiles);
+          setError(null);
+        }
+      } catch {
+        if (!ignore) {
+          setProfiles((previous) => previous ?? []);
+          setError("Could not load profiles. Please try again.");
+        }
+      }
+    }
+
+    void fetchInitialFeed();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const refreshFeed = useCallback(() => {
     setProfiles(null);

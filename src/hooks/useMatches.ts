@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -25,8 +24,34 @@ export function useMatches() {
   }, []);
 
   useEffect(() => {
-    void loadMatches();
-  }, [loadMatches]);
+    let ignore = false;
+
+    async function fetchInitialMatches() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await getMatches();
+        if (!ignore) {
+          setMatches(data.matches);
+        }
+      } catch {
+        if (!ignore) {
+          setError("Could not load matches.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void fetchInitialMatches();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   return {
     matches,

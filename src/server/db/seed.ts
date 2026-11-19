@@ -1,7 +1,6 @@
 import Database from "better-sqlite3";
-import { CURRENT_USER_ID } from "../config/config";
+import { CURRENT_USER_ID } from "@/server/constants";
 import { mockProfiles } from "../seed/profiles";
-
 
 export const PROFILES_WHO_LIKED_DEMO_USER = [
   "profile-001",

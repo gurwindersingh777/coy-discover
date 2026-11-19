@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getDb } from "@/server/db/connection";
+import { CURRENT_USER_ID } from "@/server/constants";
 import { jsonError, withErrorHandling } from "@/server/http";
 import { swipe } from "@/server/services/discover.service";
-import { CURRENT_USER_ID } from "@/server/config/config";
 
 const swipeSchema = z.object({
   profileId: z.string().min(1, "Profile ID is required"),
@@ -11,7 +11,6 @@ const swipeSchema = z.object({
 });
 
 export const POST = withErrorHandling(async (request: Request) => {
-
   const body = await request.json().catch(() => null);
   const parsed = swipeSchema.safeParse(body);
 

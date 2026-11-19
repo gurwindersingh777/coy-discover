@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { mockProfiles } from "../seed/profiles";
 import { createTestDb } from "../testing/createTestDb";
 import { getFeed, getMatches, swipe } from "./discover.service";
-import { CURRENT_USER_ID } from "../config/config";
+import { CURRENT_USER_ID } from "@/server/constants";
 
 const LIKER = "profile-001"; // seeded: already liked the demo user
 const OTHER_LIKER = "profile-004"; // seeded: already liked the demo user
