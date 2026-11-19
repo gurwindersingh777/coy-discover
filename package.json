@@ -12,6 +12,9 @@
     "typecheck": "tsc --noEmit",
     "db:reset": "tsx scripts/reset-db.ts"
   },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "dependencies": {
     "better-sqlite3": "^13.2.0",
     "framer-motion": "^14.14.0",

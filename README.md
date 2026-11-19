@@ -7,8 +7,6 @@ and nobody ever sees who liked them unless it is mutual.
 
 ## Demo
 
-https://github.com
-
 | Discover | It's a match! | Matches |
 |:--:|:--:|:--:|
 | <img src="docs/screenshots/discover.png" width="240" alt="Discover tab with a profile card"> | <img src="docs/screenshots/match.png" width="240" alt="It's a match screen"> | <img src="docs/screenshots/matches.png" width="240" alt="List of mutual matches"> |
@@ -56,7 +54,11 @@ seeded automatically on the first API request. It works best in a phone-sized wi
 | `npm run lint` | ESLint |
 | `npm run db:reset` | Wipes all swipes and matches and re-seeds the 30 profiles |
 
-If `npm install` fails on `better-sqlite3`, install your platform's C++ build tools and retry.
+> **Note:** `better-sqlite3` is a native module. `npm install` normally downloads a prebuilt
+> binary, so nothing is compiled. If no prebuilt binary is available for your Node version and it
+> has to compile from source, install Python and the Visual Studio Build Tools ("Desktop
+> development with C++" workload on Windows) and run `npm install` again. Tested with Node.js 24
+> on Windows.
 
 ## Try the demo
 
