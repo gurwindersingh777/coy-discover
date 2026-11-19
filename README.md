@@ -7,6 +7,8 @@ and nobody ever sees who liked them unless it is mutual.
 
 ## Demo
 
+https://github.com/user-attachments/assets/4cbafa5f-8311-4b71-9628-d116daa236fe
+
 | Discover | It's a match! | Matches |
 |:--:|:--:|:--:|
 | <img src="docs/screenshots/discover.png" width="240" alt="Discover tab with a profile card"> | <img src="docs/screenshots/match.png" width="240" alt="It's a match screen"> | <img src="docs/screenshots/matches.png" width="240" alt="List of mutual matches"> |
