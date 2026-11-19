@@ -1,24 +1,7 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-coy-pink: #ff3185;
-  --color-coy-ink: #17131f;
-  --color-coy-muted: #77727f;
-  --color-coy-card: #f5f3fa;
-  --color-coy-lavender: #e6e0ff;
-  --color-coy-rose: #ffe1ea;
-  --color-coy-peach: #ffe0cf;
-  --color-coy-mint: #c9f4e4;
-  --color-coy-green: #22d36b;
-
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-
-  /* Coy's hard offset "pop" shadow */
-  --shadow-pop: 3px 3px 0 #17131f;
-  --shadow-pop-lg: 6px 6px 0 #17131f;
-}
-
-button {
-  cursor: pointer;
+@layer components {
+  .btn {
+    @apply rounded-full border-2 border-black font-extrabold shadow-[3px_3px_0_#000] transition active:translate-x-0.75 active:translate-y-0.75 active:shadow-none disabled:pointer-events-none disabled:opacity-50;
+  }
 }
