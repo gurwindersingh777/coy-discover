@@ -1,4 +1,5 @@
 # Coy Discover
+![CI](https://github.com/gurwindersingh777/coy-discover/actions/workflows/ci.yml/badge.svg)
 
 A swipe-based **Discover** tab for [Coy](https://app.getcoy.com)
 
@@ -7,7 +8,7 @@ and nobody ever sees who liked them unless it is mutual.
 
 ## Demo
 
-https://github.com
+https://github.com/user-attachments/assets/4cbafa5f-8311-4b71-9628-d116daa236fe
 
 | Discover | It's a match! | Matches |
 |:--:|:--:|:--:|
