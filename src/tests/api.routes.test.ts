@@ -82,3 +82,8 @@ describe("GET /api/matches", () => {
     expect(body.matches[0].id).toBe("profile-001");
   });
 });
+
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  connection: async () => {},
+}));
