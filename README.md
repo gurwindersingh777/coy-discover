@@ -7,7 +7,7 @@ and nobody ever sees who liked them unless it is mutual.
 
 ## Demo
 
-https://github.com
+[https://github.com](https://github.com/user-attachments/assets/c2841939-85c8-4e1d-a091-cb6c8e7b2d1e)
 
 | Discover | It's a match! | Matches |
 |:--:|:--:|:--:|
