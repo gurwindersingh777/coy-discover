@@ -8,7 +8,7 @@ and nobody ever sees who liked them unless it is mutual.
 
 ## Demo
 
-https://github.com/user-attachments/assets/4cbafa5f-8311-4b71-9628-d116daa236fe
+https://github.com/user-attachments/assets/a6f5dd1c-4fb9-429d-83e0-f432612a749b
 
 | Discover | It's a match! | Matches | Empty State |
 |:--:|:--:|:--:|:--:|
