@@ -1,29 +1,42 @@
-
 "use client";
 
-import { useMatches } from "@/hooks/useMatches";
+import { motion } from "framer-motion";
+import { MapPin } from "lucide-react";
+import { ProfilePhoto } from "@/components/ProfilePhoto";
+import type { Match } from "@/types/discover";
 
 interface MatchesProps {
+  matches: Match[] | null;
+  error: string | null;
+  onRetry: () => void;
   onExplore: () => void;
 }
 
-export function Matches({ onExplore }: MatchesProps) {
-  const { matches, loading, error, refreshMatches } = useMatches();
+function timeAgo(value: string): string {
+  const minutes = Math.floor(
+    (Date.now() -
+      new Date(`${value.replace(" ", "T")}Z`).getTime()) /
+      60_000
+  );
 
+  if (Number.isNaN(minutes) || minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) return `${hours} h ago`;
+
+  return `${Math.floor(hours / 24)} d ago`;
+}
+
+export function Matches({
+  matches,
+  error,
+  onRetry,
+  onExplore,
+}: MatchesProps) {
   return (
     <section>
-      <div className="mb-6 flex items-end justify-between">
-        <h1 className="text-5xl font-extrabold tracking-tight">
-          Matches
-        </h1>
-
-        {matches !== null && (
-          <span className="mb-2 rounded-full bg-zinc-100 px-3 py-1 text-sm font-bold text-zinc-500">
-            {matches.length}
-          </span>
-        )}
-      </div>
-
       {error && (
         <div
           role="alert"
@@ -33,7 +46,7 @@ export function Matches({ onExplore }: MatchesProps) {
 
           <button
             type="button"
-            onClick={() => void refreshMatches()}
+            onClick={onRetry}
             className="font-extrabold underline"
           >
             Retry
@@ -41,42 +54,54 @@ export function Matches({ onExplore }: MatchesProps) {
         </div>
       )}
 
-      {loading && (
-        <p className="py-16 text-center font-semibold text-zinc-500">
-          Loading…
-        </p>
+      {matches === null && !error && (
+        <div className="space-y-3" aria-busy="true">
+          {[0, 1, 2].map((row) => (
+            <div
+              key={row}
+              className="h-24 animate-pulse rounded-2xl border-2 border-black/10 bg-white"
+            />
+          ))}
+        </div>
       )}
 
-      {!loading && matches && matches.length > 0 && (
-        <ul className="space-y-3">
-          {matches.map((match) => (
-            <li
+      {matches !== null && matches.length > 0 && (
+        <ul className="space-y-4">
+          {matches.map((match, index) => (
+            <motion.li
               key={match.id}
-              className="flex items-center gap-4 rounded-3xl bg-pink-100 p-3"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.04 }}
+              className="flex items-center gap-4 rounded-2xl border-2 border-black bg-white p-3 shadow-[4px_4px_0_#000]"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <ProfilePhoto
                 src={match.photo_url}
-                alt={match.name}
-                className="size-16 shrink-0 rounded-full border-2 border-black object-cover"
+                name={match.name}
+                className="size-16 shrink-0 rounded-full border-2 border-black text-2xl"
               />
 
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="truncate text-lg font-extrabold">
                   {match.name}, {match.age}
                 </p>
 
-                <p className="text-sm font-semibold text-zinc-500">
-                  Matched · {match.city}
+                <p className="flex items-center gap-1 text-sm font-bold text-zinc-500">
+                  <MapPin size={13} />
+                  {match.city}
                 </p>
               </div>
-            </li>
+
+              <span className="shrink-0 rounded-full border border-black bg-emerald-100 px-3 py-1 text-xs font-bold">
+                {timeAgo(match.matched_at)}
+              </span>
+            </motion.li>
           ))}
         </ul>
       )}
 
-      {!loading && matches?.length === 0 && !error && (
-        <div className="rounded-3xl border-2 border-black p-6 shadow-[6px_6px_0_#000]">
+      {matches !== null && matches.length === 0 && !error && (
+        <div className="rounded-3xl border-2 border-black bg-white p-6 shadow-[6px_6px_0_#000]">
           <h2 className="text-3xl font-extrabold tracking-tight">
             No matches yet
           </h2>

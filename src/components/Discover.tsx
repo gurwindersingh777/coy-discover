@@ -1,35 +1,102 @@
-
 "use client";
 
-import { AnimatePresence } from "framer-motion";
-import { Heart, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Heart, Lock, Sparkles, X } from "lucide-react";
 import { MatchModal } from "@/components/MatchModal";
+import { Matches } from "@/components/Matches";
 import { ProfileCard } from "@/components/ProfileCard";
 import { useDiscover } from "@/hooks/useDiscover";
+import { useMatches } from "@/hooks/useMatches";
 
-interface DiscoverProps {
-  onOpenMatches: () => void;
-}
+type View = "swipe" | "matches";
 
-export function Discover({ onOpenMatches }: DiscoverProps) {
-  const { profiles, currentProfile, nextProfile, error, isSwiping, direction, match, swipe, refreshFeed, closeMatch
-  } = useDiscover();
+const switchClass = (active: boolean) =>
+  `flex items-center rounded-full px-4 py-1.5 text-sm font-extrabold transition-colors ${active
+    ? "bg-black text-white"
+    : "text-zinc-500 hover:text-black"
+  }`;
 
-  const showEmpty = profiles !== null && profiles.length === 0 && !error;
+export function Discover() {
+  const [view, setView] = useState<View>("swipe");
+
+  const { profiles, currentProfile, error, isSwiping, direction, match, swipe, refreshFeed, closeMatch } = useDiscover();
+
+  const { matches, error: matchesError, refreshMatches } = useMatches();
+
+  useEffect(() => {
+    if (match) {
+      void refreshMatches();
+    }
+  }, [match, refreshMatches]);
+
+  useEffect(() => {
+    if (view !== "swipe" || match) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") {
+        void swipe("like");
+      }
+
+      if (event.key === "ArrowLeft") {
+        void swipe("pass");
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [view, match, swipe]);
+
+  const showDeck = profiles !== null && (currentProfile !== undefined || isSwiping);
+
+  const showEmpty = profiles !== null && !currentProfile && !isSwiping && !error;
+
+  const matchCount = matches?.length ?? 0;
 
   return (
     <section>
-      <div className="mb-6 flex items-end justify-between">
-        <h1 className="text-5xl font-extrabold tracking-tight"> Discover</h1>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h1 className="text-4xl font-extrabold tracking-tight">Discover</h1>
 
-        {profiles !== null && (
-          <span className="mb-2 rounded-full bg-zinc-100 px-3 py-1 text-sm font-bold text-zinc-500">
-            {profiles.length} left
-          </span>
-        )}
+        <div className="flex rounded-full border-2 border-black bg-white p-1">
+          <button
+            type="button"
+            aria-pressed={view === "swipe"}
+            onClick={() => setView("swipe")}
+            className={switchClass(view === "swipe")}
+          >
+            Swipe
+          </button>
+
+          <button
+            type="button"
+            aria-pressed={view === "matches"}
+            onClick={() => setView("matches")}
+            className={switchClass(view === "matches")}
+          >
+            Matches
+
+            {matchCount > 0 && (
+              <motion.span
+                key={matchCount}
+                initial={{ scale: 1.7 }}
+                animate={{ scale: 1 }}
+                className="ml-2 inline-flex size-5 items-center justify-center rounded-full bg-pink-500 text-xs font-extrabold text-white"
+              >
+                {matchCount}
+              </motion.span>
+            )}
+          </button>
+        </div>
       </div>
 
-      {error && (
+      <p className="mb-5 inline-flex -rotate-1 items-center gap-2 rounded-xl border-2 border-black bg-orange-200 px-3 py-1.5 text-sm font-extrabold shadow-[3px_3px_0_#000]">
+        <Lock size={14} />
+        Nobody sees your likes unless it&apos;s mutual
+      </p>
+
+      {error && view === "swipe" && (
         <div
           role="alert"
           className="mb-4 flex items-center justify-between gap-3 rounded-2xl bg-pink-100 p-4 text-sm font-semibold"
@@ -46,76 +113,109 @@ export function Discover({ onOpenMatches }: DiscoverProps) {
         </div>
       )}
 
-      {profiles === null && (
-        <div className="mx-auto h-[min(60svh,560px)] min-h-96 w-full max-w-sm animate-pulse rounded-3xl bg-zinc-100" />
-      )}
-
-      {profiles !== null && currentProfile && (
+      {view === "swipe" && (
         <>
-          <div className="relative mx-auto h-[min(60svh,560px)] min-h-96 w-full max-w-sm">
-            {nextProfile && (
-              <div
-                aria-hidden
-                className="absolute inset-0 translate-y-3 scale-95 rounded-3xl border-2 border-black/20 bg-violet-100"
-              />
-            )}
+          {profiles === null && (
+            <div
+              aria-busy="true"
+              className="mx-auto h-[min(64svh,600px)] min-h-112 w-full max-w-sm animate-pulse rounded-3xl border-2 border-black/10 bg-white"
+            />
+          )}
 
-            <AnimatePresence mode="wait" custom={direction}>
-              <ProfileCard
-                key={currentProfile.id}
-                profile={currentProfile}
-                onSwipe={swipe}
-                disabled={isSwiping}
-              />
-            </AnimatePresence>
-          </div>
+          {showDeck && (
+            <>
+              <div className="relative mx-auto h-120 w-full max-w-100">
+                <AnimatePresence mode="wait" custom={direction}>
+                  {currentProfile && (
+                    <ProfileCard
+                      key={currentProfile.id}
+                      profile={currentProfile}
+                      onSwipe={swipe}
+                      disabled={isSwiping}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
 
-          <p className="mt-6 text-center text-xs font-semibold text-zinc-500">
-            Swipe right to like · left to pass
-          </p>
+              <p className="mt-5 text-center text-xs font-semibold text-zinc-500">
+                Swipe right to like • left to pass
+              </p>
 
-          <div className="mt-4 flex items-center justify-center gap-8">
-            <button
-              type="button"
-              aria-label="Pass on this profile"
-              onClick={() => void swipe("pass")}
-              disabled={isSwiping}
-              className="btn flex size-16 items-center justify-center bg-white hover:bg-neutral-100 disabled:opacity-50"
-            >
-              <X size={30} strokeWidth={3} />
-            </button>
+              <div className="mt-6 flex items-start justify-center gap-10">
+                <div className="flex flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Pass on this profile"
+                    onClick={() => void swipe("pass")}
+                    disabled={isSwiping || !currentProfile}
+                    className="btn flex size-16 items-center justify-center bg-white disabled:opacity-50"
+                  >
+                    <X size={30} strokeWidth={3} />
+                  </button>
 
-            <button
-              type="button"
-              aria-label="Like this profile"
-              onClick={() => void swipe("like")}
-              disabled={isSwiping}
-              className="btn flex size-16 items-center justify-center bg-pink-500 text-white hover:bg-pink-400 disabled:opacity-50"
-            >
-              <Heart size={28} fill="white" />
-            </button>
-          </div>
+                  <span className="text-xs font-bold text-zinc-500">Pass</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Like this profile"
+                    onClick={() => void swipe("like")}
+                    disabled={isSwiping || !currentProfile}
+                    className="btn flex size-16 items-center justify-center bg-pink-500 text-white disabled:opacity-50"
+                  >
+                    <Heart size={28} fill="white" />
+                  </button>
+
+                  <span className="text-xs font-bold text-zinc-500">Like</span>
+                </div>
+              </div>
+
+
+            </>
+          )}
+
+          {showEmpty && (
+            <div className="rounded-3xl border-2 border-black bg-white p-6 text-center shadow-[6px_6px_0_#000]">
+              <div className="mx-auto flex size-20 items-center justify-center rounded-full border-2 border-black bg-violet-200 shadow-[3px_3px_0_#000]">
+                <Sparkles size={34} />
+              </div>
+
+              <h2 className="mt-5 text-3xl font-extrabold tracking-tight">
+                You&apos;ve seen everyone for now
+              </h2>
+
+              <p className="mt-2 text-zinc-500">
+                Anyone you liked stays private unless they liked you back.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => setView("matches")}
+                className="btn mt-6 w-full bg-pink-500 px-6 py-3 text-white"
+              >
+                See your matches
+              </button>
+
+              <button
+                type="button"
+                onClick={() => void refreshFeed()}
+                className="mt-4 text-sm font-bold text-zinc-500 underline"
+              >
+                Refresh feed
+              </button>
+            </div>
+          )}
         </>
       )}
 
-      {showEmpty && (
-        <div className="rounded-3xl border-2 border-black p-6 shadow-[6px_6px_0_#000]">
-          <h2 className="text-3xl font-extrabold tracking-tight">
-            You&apos;re all caught up!
-          </h2>
-
-          <p className="mt-2 text-zinc-500">
-            You&apos;ve seen everyone for now. Check back when more people join.
-          </p>
-
-          <button
-            type="button"
-            onClick={refreshFeed}
-            className="btn mt-6 w-full bg-pink-500 px-6 py-3 text-white"
-          >
-            Refresh feed
-          </button>
-        </div>
+      {view === "matches" && (
+        <Matches
+          matches={matches}
+          error={matchesError}
+          onRetry={() => void refreshMatches()}
+          onExplore={() => setView("swipe")}
+        />
       )}
 
       <AnimatePresence>
@@ -126,7 +226,7 @@ export function Discover({ onOpenMatches }: DiscoverProps) {
             onClose={closeMatch}
             onViewMatches={() => {
               closeMatch();
-              onOpenMatches();
+              setView("matches");
             }}
           />
         )}
